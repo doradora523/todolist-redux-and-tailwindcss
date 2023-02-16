@@ -11,9 +11,12 @@ import { TiPencil } from "react-icons/ti";
 import { BsTrash } from "react-icons/bs";
 import NoToDoMessage from "./NoToDoMessage";
 import SortCriteria from "./SortCriteria";
-import Cancel from "./Buttons/Cancel";
 
-const ToDoList = ({ showModal,setShowModal,currentToDo,setCurrentToDo,newTask,setNewTask }) => {
+const ToDoList = () => {
+  const [showModal, setShowModal] = useState(false);
+  const [currentToDo, setCurrentToDo] = useState(null);
+  const [newTask, setNewTask] = useState("");
+
   const dispatch = useDispatch();
 
   const todoList = useSelector((state) => state.todo.todoList);
@@ -37,39 +40,46 @@ const ToDoList = ({ showModal,setShowModal,currentToDo,setCurrentToDo,newTask,se
   }, []);
 
   const handleAddTodo = (task) => {
-    if (task.trim().length === 0) { // task의 공백을 제거한 문자열이 0 일 경우
+    if (task.trim().length === 0) {
+      // task의 공백을 제거한 문자열이 0 일 경우
       alert("Please enter a task");
-    } else { // 0 이 아닌 경우
+    } else {
+      // 0 이 아닌 경우
       dispatch(addTodo({ task: task, id: Date.now() })); // addTodo action을 불러와서 state값의 task와 id를 payload와 같이 바꿔준다.
       setShowModal(true); // modal 창을 띄운다.
       setNewTask(""); // input 창의 value값을 삭제한다.
     }
   };
 
-  const handleUpdateToDo = (id, task) => { //함수를 호출할 때 인자로 id와 task를 받는다.
-    if (task.trim().length === 0) { // task의 공백을 제외한 문자열이 0 일 경우,
+  const handleUpdateToDo = (id, task) => {
+    //함수를 호출할 때 인자로 id와 task를 받는다.
+    if (task.trim().length === 0) {
+      // task의 공백을 제외한 문자열이 0 일 경우,
       alert("Please enter a task");
-    } else { // 0이 아닌 경우,
+    } else {
+      // 0이 아닌 경우,
       dispatch(updateTodo({ task: task, id: id })); // updateTodo action을 불러와서 state값의 task와 id를 payload와 같이 바꿔준다.
       setShowModal(false); // modal 창을 끈다.
     }
   };
 
-  const handleDeleteToDo = (id) => { // 함수 호출 시 인자로 id를 받아온다.
+  const handleDeleteToDo = (id) => {
+    // 함수 호출 시 인자로 id를 받아온다.
     const updatedToDoList = todoList.filter((todo) => todo.id !== id); // 변수 updatedToDoList에 state: todoList 에서 todo의 state중 id 가 받아온 인자값 id(지우고싶은 doto.id)와 같지 않은 todoList만 변수에 담아준다.
     dispatch(setTodoList(updatedToDoList)); // action setTodoList를 불러와 변수에 담긴 새로운 todoList로 state를 변경한다.
     localStorage.setItem("todoList", JSON.stringify(updatedToDoList)); // 로컬스토리지에 있는 "todoList"도 updatedToDoList로 바꿔준다.
   };
 
-
-  const sortToDoList = todoList.filter((todo) => { // 변수 sortToDoList에 todoList를 필터링하여 선택된 todoList를 담아준다.
+  const sortToDoList = todoList.filter((todo) => {
+    // 변수 sortToDoList에 todoList를 필터링하여 선택된 todoList를 담아준다.
     if (sortCriteria === "All") return true; // sort가 "All" 인 경우 true를 리턴한다.
     if (sortCriteria === "Completed" && todo.completed) return true; // sort가 "Completed" 이며 todo의 state 중 completed가 true 인 경우 true를 리턴한다.
     if (sortCriteria === "Not Completed" && !todo.completed) return true; // sort가 "Not Completed" 이며 todo의 state 중 completed가 false 인 경우 true를 리턴한다.
     return false; // 조건문에 해당하지 않는 경우 false를 리턴한다.
   });
 
-  const handleToggleCompleted = (id) => { // 함수 호출시 받아온 인자값 id
+  const handleToggleCompleted = (id) => {
+    // 함수 호출시 받아온 인자값 id
     dispatch(toggleCompleted({ id })); // action toggleCompleted 를 호출하여 state값에 받아온 id를 넣어주어 함수를 실행시킨다.
   };
 
@@ -101,12 +111,23 @@ const ToDoList = ({ showModal,setShowModal,currentToDo,setCurrentToDo,newTask,se
                   >
                     Save
                   </button>
-                  <Cancel setShowModal={setShowModal} />
+
+                  <button
+                    className="bg-Tangaroa rounded-md text-white py-3 px-10"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </button>
                 </>
               ) : (
                 // currentToDo 의 값이 없을 때 보여줄 button (Cancel/Add)
                 <>
-                  <Cancel setShowModal={setShowModal} />
+                  <button
+                    className="bg-Tangaroa rounded-md text-white py-3 px-10"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </button>
                   <button
                     className="bg-sunsetOrange text-white py-3 px-10 rounded-md"
                     onClick={() => {
@@ -138,7 +159,6 @@ const ToDoList = ({ showModal,setShowModal,currentToDo,setCurrentToDo,newTask,se
                 key={todo.id}
                 className="flex items-center justify-between mb-6 bg-orange-200 mx-auto w-full md:w-[75%] rounded-md p-4"
               >
-
                 {/* todos */}
                 <div
                   className={`${
